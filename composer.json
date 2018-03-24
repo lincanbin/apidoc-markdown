@@ -1,0 +1,28 @@
+{
+    "name": "lincanbin/PHP-apiDoc-markdown",
+    "description": "Generate API documentation in markdown format from API annotations in your source code.",
+    "type": "library",
+    "keywords": [
+        "apidoc",
+        "markdown",
+        "documentation",
+        "documentation-tool"
+    ],
+    "homepage": "https://github.com/lincanbin/PHP-apiDoc-markdown",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Canbin Lin",
+            "email": "lincanbin@hotmail.com",
+            "role": "lead"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/lincanbin/PHP-apiDoc-markdown/issues"
+    },
+    "prefer-stable": true,
+    "minimum-stability": "dev",
+    "bin": [
+        "apidoc"
+    ]
+}
