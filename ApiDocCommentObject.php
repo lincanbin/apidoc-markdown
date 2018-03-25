@@ -10,7 +10,7 @@ class ApiDocCommentObject
 {
     const REGEX_VAR = '([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)';
     const REGEX_ALL = '(.*)+';
-    const parseRule = array(
+    const parseRules = array(
         'api' => array(
             //https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol#Request_methods
             'method' => '{(get|head|post|put|delete|trace|options|connnect|patch)}',
@@ -31,6 +31,7 @@ class ApiDocCommentObject
     {
         $this->comment = $comment;
         $this->parseBlock();
+        $this->parseParams();
     }
 
     /**
@@ -124,6 +125,43 @@ class ApiDocCommentObject
 
     private function parseParams()
     {
-        
+        foreach ($this->params as $paramName => $params) {
+            if (!isset(self::parseRules[$paramName])) {
+                continue;
+            }
+            // if the param hasn't been added yet, create a key for it
+            if (!isset($this->parsedParams[$paramName])) {
+                $this->parsedParams[$paramName] = array();
+            }
+
+            foreach ($params as $paramString) {
+                $parseRulesKeys = array_keys($this::parseRules[$paramName]);
+                $parseRuleKey = null;
+                $parseRuleKey = array_shift($parseRulesKeys) ?: $parseRuleKey;
+                $result = array();
+                $options = array_filter(explode(' ', $paramString), function ($item) {
+                    return $item !== '';
+                });
+                foreach ($options as $option) {
+                    if ($parseRuleKey === null) {
+                        break;
+                    }
+                    $continue = true;
+                    do {
+                        if (preg_match('@' . self::parseRules[$paramName][$parseRuleKey] . '@i', $option) > 0) {
+                            $result[$parseRuleKey] = isset($result[$parseRuleKey])
+                                ? $result[$parseRuleKey] . ' ' . $option
+                                : $option;
+                            $continue = false;
+                        }
+                        $parseRuleKey = array_shift($parseRulesKeys) ?: $parseRuleKey;
+                        if ($parseRuleKey === null) {
+                            $continue = false;
+                        }
+                    } while ($continue);
+                }
+                $this->parsedParams[$paramName][] = $result;
+            }
+        }
     }
 }

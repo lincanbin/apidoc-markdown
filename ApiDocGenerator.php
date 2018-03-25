@@ -54,9 +54,9 @@ class ApiDocGenerator
     {
         $comment[1] = mb_substr($comment[1], 2, mb_strlen($comment[1]) - 2);
         echo $fileName . "\n";
-        var_dump($comment);
+        //var_dump($comment);
         $apiDocCommentObject = new ApiDocCommentObject($comment[1], $fileName, $comment[2]);
-        var_dump($apiDocCommentObject);
-
+        //var_dump($apiDocCommentObject);
+        var_dump($apiDocCommentObject->parsedParams);
     }
 }
