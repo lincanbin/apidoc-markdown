@@ -9,15 +9,88 @@
 class ApiDocCommentObject
 {
     const REGEX_VAR = '([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)';
+    const REGEX_HTTP_METHOD = '{(get|head|post|put|delete|trace|options|connnect|patch)}';
+    const REGEX_TYPE = '{' . self::REGEX_VAR . '(\[\])?}';
+    const REGEX_GROUP = '\(' . self::REGEX_VAR . '\)';
     const REGEX_ALL = '(.*)+';
+    const REGEX_ALL_WITH_LINE_BREAK = '(.*|\n)+';
+    const REGEX_FIELD_WITH_DEFAULT = '(\[)?' . self::REGEX_VAR . '({(\d+)?(\.\.|-)(\d+)?})?(=' . self::REGEX_VAR . ')?(\])?';
+    const parseExampleRule = array(
+        'type'    => self::REGEX_TYPE,
+        'title'   => self::REGEX_ALL,//TODO: To be repaired
+        'example' => self::REGEX_ALL_WITH_LINE_BREAK,
+    );
     const parseRules = array(
-        'api' => array(
+        'api'               => array(
             //https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol#Request_methods
-            'method' => '{(get|head|post|put|delete|trace|options|connnect|patch)}',
+            'method' => self::REGEX_HTTP_METHOD,
             'path'   => self::REGEX_ALL,
             'title'  => self::REGEX_ALL,
         ),
+        'apiDefine'         => array(
+            'name'        => self::REGEX_VAR,
+            'title'       => self::REGEX_ALL,//TODO: To be repaired
+            'description' => self::REGEX_ALL_WITH_LINE_BREAK,
+        ),
+        'apiDeprecated'     => array(
+            'text' => self::REGEX_ALL_WITH_LINE_BREAK,
+        ),
+        'apiDescription'    => array(
+            'text' => self::REGEX_ALL_WITH_LINE_BREAK,
+        ),
+        'apiError'          => array(
+            'group'       => self::REGEX_VAR,
+            'type'        => self::REGEX_TYPE,
+            'field'       => self::REGEX_VAR,
+            'description' => self::REGEX_ALL_WITH_LINE_BREAK,
+        ),
+        'apiErrorExample'   => self::parseExampleRule,
+        'apiExample'        => self::parseExampleRule,
+        'apiGroup'          => array(
+            'name' => self::REGEX_VAR,
+        ),
+        'apiHeader'         => array(
+            'group'       => self::REGEX_GROUP,
+            'type'        => self::REGEX_TYPE,
+            'field'       => self::REGEX_FIELD_WITH_DEFAULT,
+            'description' => self::REGEX_ALL,
+        ),
+        'apiHeaderExample'  => self::parseExampleRule,
+        'apiIgnore'         => array(
+            'hint' => self::REGEX_ALL_WITH_LINE_BREAK,
+        ),
+        'apiName'           => array(
+            'name' => self::REGEX_ALL,
+        ),
+        'apiParam'          => array(
+            'group'       => self::REGEX_GROUP,
+            'type'        => self::REGEX_TYPE,
+            'field'       => self::REGEX_FIELD_WITH_DEFAULT,
+            'description' => self::REGEX_ALL_WITH_LINE_BREAK,
+        ),
+        'apiParamExample'   => self::parseExampleRule,
+        'apiPermission'     => array(
+            'name' => self::REGEX_ALL,
+        ),
+        'apiPrivate'        => array(),
+        'apiSampleRequest ' => array(
+            'url' => self::REGEX_ALL,
+        ),
+        'apiSuccess'        => array(
+            'group'       => self::REGEX_GROUP,
+            'type'        => self::REGEX_TYPE,
+            'field'       => self::REGEX_FIELD_WITH_DEFAULT,
+            'description' => self::REGEX_ALL_WITH_LINE_BREAK,
+        ),
+        'apiSuccessExample' => self::parseExampleRule,
+        'apiUse'            => array(
+            'name' => self::REGEX_ALL,
+        ),
+        'apiVersion'        => array(
+            'version' => self::REGEX_ALL,
+        ),
     );
+
     public $fileName;
     public $lineNumber;
     public $comment = '';
@@ -26,7 +99,12 @@ class ApiDocCommentObject
 
     public $parsedParams = array();
 
-
+    /**
+     * ApiDocCommentObject constructor.
+     * @param $comment
+     * @param $fileName
+     * @param $lineNumber
+     */
     public function __construct($comment, $fileName, $lineNumber)
     {
         $this->comment = $comment;
@@ -48,9 +126,9 @@ class ApiDocCommentObject
 
     /**
      * Checks if the param exists
-     *
-     * @param string $paramName
-     * @return mixed
+     * @param $paramName
+     * @param null $values
+     * @return mixed|null|string
      */
     public function __call($paramName, $values = null)
     {
@@ -148,14 +226,14 @@ class ApiDocCommentObject
                     }
                     $continue = true;
                     do {
-                        if (preg_match('@' . self::parseRules[$paramName][$parseRuleKey] . '@i', $option) > 0) {
+                        if (preg_match('@^' . self::parseRules[$paramName][$parseRuleKey] . '$@i', $option) > 0) {
                             $result[$parseRuleKey] = isset($result[$parseRuleKey])
                                 ? $result[$parseRuleKey] . ' ' . $option
                                 : $option;
                             $continue = false;
                         }
                         $parseRuleKey = array_shift($parseRulesKeys) ?: $parseRuleKey;
-                        if ($parseRuleKey === null) {
+                        if (count($parseRulesKeys) === 0) {
                             $continue = false;
                         }
                     } while ($continue);

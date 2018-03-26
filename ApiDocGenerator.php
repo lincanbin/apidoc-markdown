@@ -52,7 +52,8 @@ class ApiDocGenerator
 
     private function parseComment($comment, $fileName)
     {
-        $comment[1] = mb_substr($comment[1], 2, mb_strlen($comment[1]) - 2);
+        // CRLF to LF
+        $comment[1] = str_replace("\r\n", "\n", mb_substr($comment[1], 2, mb_strlen($comment[1]) - 2));
         echo $fileName . "\n";
         //var_dump($comment);
         $apiDocCommentObject = new ApiDocCommentObject($comment[1], $fileName, $comment[2]);
