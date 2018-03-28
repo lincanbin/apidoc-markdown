@@ -17,7 +17,7 @@ class ApiDocCommentObject
     const REGEX_FIELD_WITH_DEFAULT = '(\[)?' . self::REGEX_VAR . '({(\d+)?(\.\.|-)(\d+)?})?(=' . self::REGEX_VAR . ')?(\])?';
     const parseExampleRule = array(
         'type'    => self::REGEX_TYPE,
-        'title'   => self::REGEX_ALL,//TODO: To be repaired
+        'title'   => self::REGEX_ALL,
         'example' => self::REGEX_ALL_WITH_LINE_BREAK,
     );
     const parseRules = array(
@@ -201,6 +201,26 @@ class ApiDocCommentObject
         }
     }
 
+    private function explode($paramName, $paramString)
+    {
+        if (self::parseRules[$paramName] === self::parseExampleRule || $paramName === 'apiDefine') {
+            $tempLines = explode("\n", $paramString, 2);
+            $result = array_filter(explode(' ', $tempLines[0]), function ($item) {
+                return $item !== '';
+            });
+            if (isset($tempLines[1])) {
+                $result[] = $tempLines[1] . "\n";
+            }
+        } elseif ($paramName === 'apiDescription') {
+            $result = array($paramString);
+        } else {
+            $result = array_filter(explode(' ', $paramString), function ($item) {
+                return $item !== '';
+            });
+        }
+        return $result;
+    }
+
     private function parseParams()
     {
         foreach ($this->params as $paramName => $params) {
@@ -213,13 +233,14 @@ class ApiDocCommentObject
             }
 
             foreach ($params as $paramString) {
+                if ($paramString === "") {
+                    continue;
+                }
                 $parseRulesKeys = array_keys($this::parseRules[$paramName]);
                 $parseRuleKey = null;
                 $parseRuleKey = array_shift($parseRulesKeys) ?: $parseRuleKey;
                 $result = array();
-                $options = array_filter(explode(' ', $paramString), function ($item) {
-                    return $item !== '';
-                });
+                $options = $this->explode($paramName, $paramString);
                 foreach ($options as $option) {
                     if ($parseRuleKey === null) {
                         break;
