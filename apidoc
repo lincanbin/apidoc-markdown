@@ -22,11 +22,14 @@ $getPathOption = function ($shortOption, $longOption, $default = '') use ($optio
         : (isset($options[$longOption]) ? $options[$longOption] : null);
     $result = is_null($result) ? $default : $result;
     $result = is_dir($result) ? (realpath($result) ?: $result) : getcwd() . DIRECTORY_SEPARATOR . $result;
+    if (substr($result, -1, 1) !== DIRECTORY_SEPARATOR) {
+        $result .= DIRECTORY_SEPARATOR;
+    }
     return $result;
 };
 $optionInput = $getPathOption('i', 'input');
-$optionOutput = $getPathOption('o', 'output', 'doc' . DIRECTORY_SEPARATOR);
-$optionTemplate = $getPathOption('t', 'template', __DIR__ . DIRECTORY_SEPARATOR . 'template' . DIRECTORY_SEPARATOR);
+$optionOutput = $getPathOption('o', 'output', 'doc');
+$optionTemplate = $getPathOption('t', 'template', __DIR__ . DIRECTORY_SEPARATOR . 'template');
 if (isset($options['h']) || isset($options['help'])) {
     $phpPath = PHP_BINARY;
     echo <<<help
