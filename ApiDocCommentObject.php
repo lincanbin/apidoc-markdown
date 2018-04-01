@@ -6,6 +6,31 @@
  * Time: 10:30
  */
 
+/**
+ * Class ApiDocCommentObject
+ * @property array api
+ * @property array apiDefine
+ * @property array apiDeprecated
+ * @property array apiDescription
+ * @property array apiError
+ * @property array apiErrorExample
+ * @property array apiExample
+ * @property array apiGroup
+ * @property array apiHeader
+ * @property array apiHeaderExample
+ * @property array apiIgnore
+ * @property array apiName
+ * @property array apiParam
+ * @property array apiParamExample
+ * @property array apiPermission
+ * @property array apiPrivate
+ * @property array apiSampleRequest
+ * @property array apiSuccess
+ * @property array apiSuccessExample
+ * @property array apiUse
+ * @property array apiVersion
+ *
+ */
 class ApiDocCommentObject
 {
     const REGEX_VAR = '([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)';
@@ -20,6 +45,7 @@ class ApiDocCommentObject
         'title'   => self::REGEX_ALL,
         'example' => self::REGEX_ALL_WITH_LINE_BREAK,
     );
+    const multipleParams = array('apiError', 'apiHeader', 'apiParam', 'apiSuccess');
     const parseRules = array(
         'api'               => array(
             //https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol#Request_methods
@@ -97,6 +123,7 @@ class ApiDocCommentObject
     public $description = '';
     public $params = array();
 
+    public $type = null;
     public $parsedParams = array();
 
     /**
@@ -110,6 +137,15 @@ class ApiDocCommentObject
         $this->comment = $comment;
         $this->parseBlock();
         $this->parseParams();
+        if ($this->api !== null && $this->apiGroup !== null && $this->apiName !== null) {
+            $this->type = 'api';
+        }
+        if ($this->apiDefine !== null && isset($this->apiDefine['name']) && $this->apiDefine['name'] !== '') {
+            $this->type = 'define';
+        }
+        if ($this->apiIgnore !== null) {//$this->apiPrivate === null || $this->apiIgnore !==null
+            $this->type = null;
+        }
     }
 
     /**
@@ -134,10 +170,10 @@ class ApiDocCommentObject
     {
         if ($paramName == "description") {
             return $this->description;
-        } else if (isset($this->params[$paramName])) {
-            $params = $this->params[$paramName];
+        } else if (isset($this->parsedParams[$paramName])) {
+            $params = $this->parsedParams[$paramName];
 
-            if (count($params) == 1) {
+            if (!in_array($paramName, self::multipleParams) && count($params) > 0) {
                 return $params[0];
             } else {
                 return $params;
@@ -262,5 +298,33 @@ class ApiDocCommentObject
                 $this->parsedParams[$paramName][] = $result;
             }
         }
+    }
+
+    public function parseField($param)
+    {
+        $result = array(
+            'key'         => '',
+            'type'        => '',
+            'required'    => '√',
+            'default'     => '',
+            'description' => ''
+        );
+        if (substr($param['field'], 0, 1) === '[' && substr($param['field'], -1, 1) === ']')
+        {
+            $result['required'] = '×';
+            $param['field'] = substr($param['field'], 1, -1);
+        }
+        $temp = explode('=', $param['field'], 2);
+        $result['key'] = $temp[0];
+        if (isset($temp[1])) {
+            $result['default'] = $temp[1];
+        }
+        if (isset($param['description'])) {
+            $result['description'] = $param['description'];
+        }
+        if (isset($param['type'])) {
+            $result['type'] = substr($param['type'], 1, -1);
+        }
+        return $result;
     }
 }
