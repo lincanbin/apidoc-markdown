@@ -35,6 +35,38 @@ if ($apidoc->type === 'api'):
 ```
 <?php
 endif;
+
+// apiSampleRequest
+if ($apidoc->type === 'api' && (!is_null($apidoc->apiSampleRequest) || $this->config->sampleUrl !== '')):
+    ?>
+##### Sample Request
+
+```
+<?php
+    if (!is_null($apidoc->apiSampleRequest)) {
+        echo $apidoc->apiSampleRequest['url'];
+    } else {
+        echo $this->config->sampleUrl . $apidoc->api['path'];
+    }
+?>
+
+```
+
+<?php
+endif;
+
+// apiExample
+if (!is_null($apidoc->apiExample)):
+    ?>
+##### Example for usage of an API method
+<?php echo $apidoc->apiExample['title'] ?: ''; ?>
+
+```<?php echo isset($apidoc->apiExample['type']) ? substr($apidoc->apiExample['type'], 1, -1) : ''; ?>
+<?php echo $apidoc->apiExample['example']; ?>
+```
+<?php
+endif;
+
 // apiParam
 if (!is_null($apidoc->apiParam)):
 ?>
@@ -56,6 +88,7 @@ foreach ($apidoc->apiParam as $param):
 ?>|<?php
     echo $parsedParam['description'];
 ?>
+
 <?php
 endforeach;?>
 
@@ -69,8 +102,45 @@ if (!is_null($apidoc->apiParamExample)):
 ### Parameter Request Example
 <?php echo $apidoc->apiParamExample['title'] ?: ''; ?>
 
-```<?php echo $apidoc->apiParamExample['type'] ? substr($apidoc->apiParamExample['type'], 1, -1) : ''; ?>
+```<?php echo isset($apidoc->apiParamExample['type']) ? substr($apidoc->apiParamExample['type'], 1, -1) : ''; ?>
 <?php echo $apidoc->apiParamExample['example']; ?>
+```
+<?php
+endif;
+// apiSuccess
+if (!is_null($apidoc->apiSuccess)):
+    ?>
+
+###  Success return Parameter
+Key|Value Type|Description
+---|---|---
+    <?php
+    foreach ($apidoc->apiSuccess as $param):
+        $parsedParam = $apidoc->parseField($param);
+        ?>
+<?php
+echo $parsedParam['key'];
+?>|<?php
+echo $parsedParam['type'];
+?>|<?php
+echo $parsedParam['description'];
+?>
+
+    <?php
+    endforeach;?>
+
+<?php
+endif;
+?>
+<?php
+// apiSuccessExample
+if (!is_null($apidoc->apiSuccessExample)):
+    ?>
+### Example of a success return message
+<?php echo $apidoc->apiSuccessExample['title'] ?: ''; ?>
+
+```<?php echo isset($apidoc->apiSuccessExample['type']) ? substr($apidoc->apiSuccessExample['type'], 1, -1) : ''; ?>
+<?php echo $apidoc->apiSuccessExample['example']; ?>
 ```
 <?php
 endif;
