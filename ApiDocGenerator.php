@@ -85,8 +85,12 @@ class ApiDocGenerator
         }
         var_dump($fileName);
         ob_start();
-        include $this->template . 'apiTemplate.php';
-        $content = ob_get_contents();
+        try{
+            include $this->template . 'apiTemplate.php';
+            $content = ob_get_contents();
+        } catch (Exception $ex){
+            $content = '';
+        }
         ob_end_clean();
         $this->saveFile($fileName, $content);
         return true;
@@ -94,6 +98,9 @@ class ApiDocGenerator
 
     private function saveFile($fileName, $content)
     {
+        if (empty($content)) {
+            return false;
+        }
         $fileName = $this->output . $fileName;
         $path = dirname($fileName);
         if (!is_dir($path)) {
