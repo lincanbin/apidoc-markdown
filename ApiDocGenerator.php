@@ -11,8 +11,8 @@ class ApiDocGenerator
     private $output;
     private $template;
     protected $config;
-
-    private $apiList;
+    private $apiDefineList = array();
+    private $apiList = array();
     /**
      * @var RecursiveIteratorIterator $fileIteratorfileIterator
      */
@@ -27,7 +27,9 @@ class ApiDocGenerator
             $this->fileIterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->input));
             $this->config = new ApiDocConfig();
             $this->config->load($this->input);
-
+            foreach ($this->config->order as $item) {
+                $this->apiList[$item] = array();
+            }
             foreach ($this->fileIterator as $file) {
                 /**
                  * @var SplFileInfo $file
@@ -36,6 +38,31 @@ class ApiDocGenerator
                     continue;
                 }
                 $this->parseFile($file);
+            }
+            // Save api define
+            foreach ($this->apiDefineList as $apiDoc) {
+                /**
+                 * @var ApiDocCommentObject $apiDoc
+                 */
+                $this->saveDoc($apiDoc);
+            }
+            // Merge apiDefine into apiDoc
+            foreach ($this->apiList as $group) {
+                foreach ($group as $apiDoc) {
+                    /**
+                     * @var ApiDocCommentObject $apiDoc
+                     */
+                    $apiDoc->mergeApiDefine($this->apiDefineList);
+                }
+            }
+            // Save api Doc
+            foreach ($this->apiList as $group) {
+                foreach ($group as $apiDoc) {
+                    /**
+                     * @var ApiDocCommentObject $apiDoc
+                     */
+                    $this->saveDoc($apiDoc);
+                }
             }
         } catch (Exception $exception) {
             echo $exception->getMessage();
@@ -68,27 +95,37 @@ class ApiDocGenerator
         echo $fileName . "\n";
         //var_dump($comment);
         $apiDocCommentObject = new ApiDocCommentObject($comment[1], $fileName, $comment[2]);
-
-        $this->saveDoc($apiDocCommentObject);
+        if ($apiDocCommentObject->type === 'api') {
+            if (!isset($this->apiList[$apiDocCommentObject->apiGroup['name']])) {
+                $this->apiList[$apiDocCommentObject->apiGroup['name']] = array();
+            }
+            $this->apiList[$apiDocCommentObject->apiGroup['name']][$apiDocCommentObject->apiName['name']] = $apiDocCommentObject;
+        } elseif ($apiDocCommentObject->type === 'define') {
+            $this->apiDefineList[$apiDocCommentObject->apiDefine['name']] = $apiDocCommentObject;
+        } else {
+            return false;
+        }
+        //$this->saveDoc($apiDocCommentObject);
+        return true;
     }
 
-    private function saveDoc(ApiDocCommentObject $apidoc)
+    private function saveDoc(ApiDocCommentObject $apiDoc)
     {
         //var_dump($apiDocCommentObject);
-        var_dump($apidoc->parsedParams);
-        if ($apidoc->type === 'api') {
-            $fileName = 'apidoc/' . $apidoc->apiGroup['name'] . '/' . $apidoc->apiName['name'] . '.md';
-        } elseif ($apidoc->type === 'define') {
-            $fileName = 'apidoc/define/' . $apidoc->apiDefine['name'] . '.md';
+        var_dump($apiDoc->parsedParams);
+        if ($apiDoc->type === 'api') {
+            $fileName = 'apidoc/' . $apiDoc->apiGroup['name'] . '/' . $apiDoc->apiName['name'] . '.md';
+        } elseif ($apiDoc->type === 'define') {
+            $fileName = 'apidoc/define/' . $apiDoc->apiDefine['name'] . '.md';
         } else {
             return false;
         }
         var_dump($fileName);
         ob_start();
-        try{
+        try {
             include $this->template . 'apiTemplate.php';
             $content = ob_get_contents();
-        } catch (Exception $ex){
+        } catch (Exception $ex) {
             $content = '';
         }
         ob_end_clean();
