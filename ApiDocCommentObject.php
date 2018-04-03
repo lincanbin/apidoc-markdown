@@ -45,7 +45,7 @@ class ApiDocCommentObject
         'title'   => self::REGEX_ALL,
         'example' => self::REGEX_ALL_WITH_LINE_BREAK,
     );
-    const multipleParams = array('apiError', 'apiHeader', 'apiParam', 'apiSuccess');
+    const multipleParams = array('apiUse', 'apiError', 'apiHeader', 'apiParam', 'apiSuccess');
     const parseRules = array(
         'api'               => array(
             //https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol#Request_methods
@@ -319,11 +319,32 @@ class ApiDocCommentObject
             $result['default'] = str_replace("\"", "", $temp[1]);;
         }
         if (isset($param['description'])) {
-            $result['description'] = str_replace("\n", " ", $param['description']);
+            $result['description'] = str_replace("\n", " <br />", $param['description']);
         }
         if (isset($param['type'])) {
             $result['type'] = substr($param['type'], 1, -1);
         }
         return $result;
+    }
+
+    public function mergeApiDefine($apiDefineList)
+    {
+        if (isset($this->parsedParams['apiUse'])) {
+            foreach ($this->parsedParams['apiUse'] as $apiDefineName) {
+                if (!isset($apiDefineList[$apiDefineName['name']])) {
+                    continue;
+                }
+                /**
+                 * @var ApiDocCommentObject $apiDefine
+                 */
+                $apiDefine = $apiDefineList[$apiDefineName['name']];
+                $temp = $apiDefine->parsedParams;
+                unset($temp['apiDefine']);
+                $this->parsedParams = array_merge_recursive($this->parsedParams, $temp);
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 }
