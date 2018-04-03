@@ -39,7 +39,7 @@ class ApiDocCommentObject
     const REGEX_GROUP = '\(' . self::REGEX_VAR . '\)';
     const REGEX_ALL = '(.*)+';
     const REGEX_ALL_WITH_LINE_BREAK = '(.*|\n)+';
-    const REGEX_FIELD_WITH_DEFAULT = '(\[)?' . self::REGEX_VAR . '({(\d+)?(\.\.|-)(\d+)?})?(=' . self::REGEX_VAR . ')?(\])?';
+    const REGEX_FIELD_WITH_DEFAULT = self::REGEX_ALL;
     const parseExampleRule = array(
         'type'    => self::REGEX_TYPE,
         'title'   => self::REGEX_ALL,
@@ -309,18 +309,17 @@ class ApiDocCommentObject
             'default'     => '',
             'description' => ''
         );
-        if (substr($param['field'], 0, 1) === '[' && substr($param['field'], -1, 1) === ']')
-        {
+        if (substr($param['field'], 0, 1) === '[' && substr($param['field'], -1, 1) === ']') {
             $result['required'] = '×';
             $param['field'] = substr($param['field'], 1, -1);
         }
         $temp = explode('=', $param['field'], 2);
         $result['key'] = $temp[0];
         if (isset($temp[1])) {
-            $result['default'] = $temp[1];
+            $result['default'] = str_replace("\"", "", $temp[1]);;
         }
         if (isset($param['description'])) {
-            $result['description'] = $param['description'];
+            $result['description'] = str_replace("\n", " ", $param['description']);
         }
         if (isset($param['type'])) {
             $result['type'] = substr($param['type'], 1, -1);
