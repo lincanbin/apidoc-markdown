@@ -1,6 +1,19 @@
 <?php
+
+/**
+ * @apiDefine MyError
+ * @apiError UserNotFound The `id` of the User was not found.
+ * @apiErrorExample {json} Error-Response:
+ *     HTTP/1.1 404 Not Found
+ *     {
+ *       "error": "UserNotFound"
+ *     }
+ */
+
+
 /**
  * @api {get} /user/:id Request User information
+ * @apiUse MyError
  * @apiExample {curl} Example-usage:
  *     curl -i http://localhost/user/4711
  * @apiName GetUser
@@ -9,6 +22,11 @@
  *
  * Example: to set a link to the GetDetails method of your group User
  * write (#User:GetDetails)
+ * @apiHeader {String} access-key Users unique access-key.
+ * @apiHeaderExample {json} Header-Example:
+ *     {
+ *       "Accept-Encoding": "Accept-Encoding: gzip, deflate"
+ *     }
  * @apiParam {Number} id Users unique ID.
  * @apiParam {String} [firstname]  Optional Firstname of the User.
  * @apiParam {String} lastname     Mandatory Lastname.
