@@ -73,7 +73,7 @@ class ApiDocCommentObject
         'apiErrorExample'   => self::parseExampleRule,
         'apiExample'        => self::parseExampleRule,
         'apiGroup'          => array(
-            'name' => self::REGEX_VAR,
+            'name' => self::REGEX_ALL,
         ),
         'apiHeader'         => array(
             'group'       => self::REGEX_GROUP,
