@@ -179,10 +179,10 @@ endif;
 if (!is_null($apiDoc->apiSuccessExample)):
     ?>
 ### Example of a success return message
-<?php echo $apiDoc->apiSuccessExample['title'] ?: ''; ?>
+<?php echo !empty($apiDoc->apiSuccessExample['title']) ? $apiDoc->apiSuccessExample['title'] : ''; ?>
 
 ```<?php echo isset($apiDoc->apiSuccessExample['type']) ? substr($apiDoc->apiSuccessExample['type'], 1, -1) : ''; ?>
-<?php echo $apiDoc->apiSuccessExample['example']; ?>
+<?php echo !empty($apiDoc->apiSuccessExample['example']) ? $apiDoc->apiSuccessExample['example'] : "\n"; ?>
 ```
 <?php
 endif;
