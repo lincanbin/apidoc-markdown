@@ -64,6 +64,7 @@ class ApiDocGenerator
                     $this->saveDoc($apiDoc);
                 }
             }
+            $this->saveIndex();
         } catch (Exception $exception) {
             echo $exception->getMessage();
         }
@@ -114,6 +115,9 @@ class ApiDocGenerator
         //var_dump($apiDocCommentObject);
         var_dump($apiDoc->parsedParams);
         if ($apiDoc->type === 'api') {
+            if (empty($apiDoc->apiGroup['name']) || empty($apiDoc->apiName['name'])) {
+                return false;
+            }
             $fileName = 'apidoc/' . $apiDoc->apiGroup['name'] . '/' . $apiDoc->apiName['name'] . '.md';
         } elseif ($apiDoc->type === 'define') {
             $fileName = 'apidoc/define/' . $apiDoc->apiDefine['name'] . '.md';
@@ -132,6 +136,22 @@ class ApiDocGenerator
         $this->saveFile($fileName, $content);
         return true;
     }
+
+    private function saveIndex()
+    {
+        $fileName = 'README.md';
+        ob_start();
+        try {
+            include $this->template . 'indexTemplate.php';
+            $content = ob_get_contents();
+        } catch (Exception $ex) {
+            $content = '';
+        }
+        ob_end_clean();
+        $this->saveFile($fileName, $content);
+        return true;
+    }
+
 
     private function saveFile($fileName, $content)
     {
