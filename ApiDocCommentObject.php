@@ -65,7 +65,7 @@ class ApiDocCommentObject
             'text' => self::REGEX_ALL_WITH_LINE_BREAK,
         ),
         'apiError'          => array(
-            'group'       => self::REGEX_VAR,
+            'group'       => self::REGEX_GROUP,
             'type'        => self::REGEX_TYPE,
             'field'       => self::REGEX_VAR,
             'description' => self::REGEX_ALL_WITH_LINE_BREAK,
@@ -303,11 +303,11 @@ class ApiDocCommentObject
     public function parseField($param)
     {
         $result = array(
-            'key'         => '',
-            'type'        => '',
+            'key'         => ' ',
+            'type'        => ' ',
             'required'    => '√',
-            'default'     => '',
-            'description' => ''
+            'default'     => ' ',
+            'description' => ' '
         );
         if (substr($param['field'], 0, 1) === '[' && substr($param['field'], -1, 1) === ']') {
             $result['required'] = '×';

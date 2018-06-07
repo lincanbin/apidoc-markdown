@@ -11,6 +11,7 @@
  */
 ?>
 # <?php echo $this->config->title ?>
+
 <?php echo $this->config->description ?>
 <?php
 foreach ($this->apiList as $groupName => $group):

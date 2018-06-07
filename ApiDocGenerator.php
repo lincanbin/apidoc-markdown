@@ -7,6 +7,10 @@ require_once __DIR__ . '/ApiDocConfig.php';
  */
 class ApiDocGenerator
 {
+    private static $supportExtension = ['php', 'js', 'java', 'go'];
+    private static $ignoreList = [
+        'node_modules'
+    ];
     private $input;
     private $output;
     private $template;
@@ -34,12 +38,17 @@ class ApiDocGenerator
                 /**
                  * @var SplFileInfo $file
                  */
-                if ($file->isDir() || $file->getExtension() !== 'php') {
+                if (
+                    0 < count(array_intersect(array_map('strtolower', preg_split("/(\|\/)/", $file->getPathname())), self::$ignoreList))
+                    || $file->isDir()
+                    || !in_array($file->getExtension(), self::$supportExtension)
+                ) {
                     continue;
                 }
                 $this->parseFile($file);
             }
             // Save api define
+
             foreach ($this->apiDefineList as $apiDoc) {
                 /**
                  * @var ApiDocCommentObject $apiDoc
@@ -61,6 +70,7 @@ class ApiDocGenerator
                     /**
                      * @var ApiDocCommentObject $apiDoc
                      */
+                    echo $apiDoc->fileName . "\n";
                     $this->saveDoc($apiDoc);
                 }
             }
@@ -78,24 +88,36 @@ class ApiDocGenerator
         if ($fileSize === 0 || $fileSize === false) {
             return false;
         }
-        echo $splFileInfo->getPathname() . "\n";
+        // echo $splFileInfo->getPathname() . "\n";
         $splFileObject = $splFileInfo->openFile('r');
-        $docComments = array_filter(token_get_all($splFileObject->fread($fileSize)), function ($entry) {
-            return is_array($entry) && $entry[0] == T_DOC_COMMENT;
-        });
+        $splFileContent = $splFileObject->fread($fileSize);
+        switch ($splFileInfo->getExtension()) {
+            case 'php':
+                $docComments = array_filter(token_get_all($splFileContent), function ($entry) {
+                    return is_array($entry) && $entry[0] == T_DOC_COMMENT;
+                });
+                break;
+            default:
+                preg_match_all("#\/\*.*?\*\/#s", $splFileContent, $temp);
+                $docComments = empty($temp) ? [] : $temp[0];
+        }
         foreach ($docComments as $docComment) {
-            $this->parseComment($docComment, $fileName);
+            if (is_array($docComment)) {
+                $this->parseComment($fileName, $docComment[1], $docComment[2]);
+            } else if (is_string($docComment)) {
+                $this->parseComment($fileName, $docComment);
+            }
         }
         return true;
     }
 
-    private function parseComment($comment, $fileName)
+    private function parseComment($fileName, $comment, $lineNumber = 1)
     {
         // CRLF to LF
-        $comment[1] = str_replace("\r\n", "\n", mb_substr($comment[1], 2, mb_strlen($comment[1]) - 2));
-        echo $fileName . "\n";
+        $comment = str_replace("\r\n", "\n", mb_substr($comment, 2, mb_strlen($comment) - 2));
+        // echo $fileName . "\n";
         //var_dump($comment);
-        $apiDocCommentObject = new ApiDocCommentObject($comment[1], $fileName, $comment[2]);
+        $apiDocCommentObject = new ApiDocCommentObject($comment, $fileName, $lineNumber);
         if ($apiDocCommentObject->type === 'api') {
             if (!isset($this->apiList[$apiDocCommentObject->apiGroup['name']])) {
                 $this->apiList[$apiDocCommentObject->apiGroup['name']] = array();
