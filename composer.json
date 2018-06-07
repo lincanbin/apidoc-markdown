@@ -1,5 +1,5 @@
 {
-    "name": "lincanbin/PHP-apiDoc-markdown",
+    "name": "lincanbin/apidoc-markdown",
     "description": "Generate API documentation in markdown format from API annotations in your source code.",
     "type": "library",
     "keywords": [
