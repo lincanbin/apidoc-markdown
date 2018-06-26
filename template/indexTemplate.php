@@ -40,4 +40,4 @@ endforeach;
 ?>
 
 
-Powered By © 2018 [PHP-apiDoc-markdown](https://github.com/lincanbin/PHP-apiDoc-markdown)
+Powered By © 2018 [apidoc-markdown](https://github.com/lincanbin/apidoc-markdown)

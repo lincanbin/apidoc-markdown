@@ -8,7 +8,7 @@
         "documentation",
         "documentation-tool"
     ],
-    "homepage": "https://github.com/lincanbin/PHP-apiDoc-markdown",
+    "homepage": "https://github.com/lincanbin/apidoc-markdown",
     "license": "Apache-2.0",
     "authors": [
         {
@@ -18,11 +18,12 @@
         }
     ],
     "support": {
-        "issues": "https://github.com/lincanbin/PHP-apiDoc-markdown/issues"
+        "issues": "https://github.com/lincanbin/apidoc-markdown/issues"
     },
     "prefer-stable": true,
     "minimum-stability": "dev",
     "bin": [
-        "apidoc"
+        "apidoc",
+        "apidoc-markdown"
     ]
 }
