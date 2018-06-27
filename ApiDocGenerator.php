@@ -78,7 +78,7 @@ class ApiDocGenerator
         } catch (Exception $exception) {
             echo $exception->getMessage();
         }
-        var_dump($this->config);
+        // var_dump($this->config);
     }
 
     private function parseFile(SplFileInfo $splFileInfo)
@@ -135,7 +135,7 @@ class ApiDocGenerator
     private function saveDoc(ApiDocCommentObject $apiDoc)
     {
         //var_dump($apiDocCommentObject);
-        var_dump($apiDoc->parsedParams);
+        // var_dump($apiDoc->parsedParams);
         if ($apiDoc->type === 'api') {
             if (empty($apiDoc->apiGroup['name']) || empty($apiDoc->apiName['name'])) {
                 return false;
@@ -146,7 +146,8 @@ class ApiDocGenerator
         } else {
             return false;
         }
-        var_dump($fileName);
+        echo $fileName . "\n";
+        // var_dump($fileName);
         ob_start();
         try {
             include $this->template . 'apiTemplate.php';
