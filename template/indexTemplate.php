@@ -13,8 +13,18 @@
 # <?php echo $this->config->title ?>
 
 <?php echo $this->config->description ?>
+
+<?php
+if ($this->config->header['title']) {
+    echo "## " . $this->config->header['title'] . "\n";
+}
+if (is_file($this->input . $this->config->header['filename'])) {
+    include $this->input . $this->config->header['filename'];
+}
+?>
 <?php
 foreach ($this->apiList as $groupName => $group):
+if (!empty($group)):
 ?>
 
 ## <?php echo $groupName ?>
@@ -36,7 +46,17 @@ echo $apiDoc->api['path'];
 <?php
         endif;
     endforeach;
+endif;
 endforeach;
+?>
+
+<?php
+if ($this->config->footer['title']) {
+    echo "## " . $this->config->footer['title'] . "\n";
+}
+if (is_file($this->input . $this->config->footer['filename'])) {
+    include $this->input . $this->config->footer['filename'];
+}
 ?>
 
 
