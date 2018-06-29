@@ -47,4 +47,7 @@ help;
 //var_dump($options);
 //var_dump($argv);
 //var_dump(getopt("h::"));
+echo "Input: " . $optionInput . "\n";
+echo "Output: " . $optionOutput . "\n\n";
 $docGenerator = new ApiDocGenerator($optionInput, $optionOutput, $optionTemplate);
+echo "\n\nSuccessfully generated! \n";

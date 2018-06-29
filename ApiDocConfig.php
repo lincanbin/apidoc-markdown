@@ -31,7 +31,7 @@ class ApiDocConfig
     public function load($inputPath)
     {
         $configFile = new SplFileInfo($inputPath . 'apidoc.json');
-        var_dump($inputPath . 'apidoc.json');
+        // var_dump($inputPath . 'apidoc.json');
         if ($configFile->isFile()) {
             $config = json_decode($configFile->openFile('r')->fread($configFile->getSize()), true);
         } else {
