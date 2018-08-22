@@ -21,7 +21,7 @@
         "issues": "https://github.com/lincanbin/apidoc-markdown/issues"
     },
     "prefer-stable": true,
-    "minimum-stability": "dev",
+    "minimum-stability": "1.0",
     "bin": [
         "apidoc",
         "apidoc-markdown"
