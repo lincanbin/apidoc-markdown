@@ -15,7 +15,7 @@
 <?php echo $this->config->description ?>
 
 <?php
-if ($this->config->header['title']) {
+if (!empty($this->config->header['title'])) {
     echo "## " . $this->config->header['title'] . "\n";
 }
 if (is_file($this->input . $this->config->header['filename'])) {
@@ -59,5 +59,7 @@ if (is_file($this->input . $this->config->footer['filename'])) {
 }
 ?>
 
+<?php echo date('Y-m-d H:i:s'); ?>
 
-Powered By © 2018 [apidoc-markdown](https://github.com/lincanbin/apidoc-markdown)
+
+Powered By © <?php echo date('Y'); ?> [apidoc-markdown](https://github.com/lincanbin/apidoc-markdown)

@@ -21,7 +21,7 @@ endif;
 <?php
 // apiDescription
 if (!is_null($apiDoc->apiDescription['text'])) :
-    echo $apiDoc->apiDescription['text'] . "\n";
+    echo $apiDoc->apiDescription['text'] . "\n\n";
     echo !is_null($apiDoc->apiDeprecated['text']) ? " ### Deprecated \n\n> " . str_replace("\n", "\n> ", $apiDoc->apiDeprecated['text']) . "\n\n" : '';
 endif;
 if ($apiDoc->type === 'api'):
