@@ -9,7 +9,7 @@ if ($apiDoc->type === 'api'):
 ?>
 # <?php
     echo (!is_null($apiDoc->apiDeprecated) ? '~~' : '') . (!is_null($apiDoc->api['title']) ? $apiDoc->api['title'] : $apiDoc->apiName['name']) . (!is_null($apiDoc->apiDeprecated) ? '~~' : '');
-    ?> ([<?php echo $apiDoc->apiGroup['name']; ?>](../../README.md#<?php echo $apiDoc->apiGroup['name']; ?>))
+    ?> ([<?php echo $apiDoc->apiGroup['name']; ?>](../../README.md#<?php echo urlencode(strtolower($apiDoc->apiGroup['name'])); ?>))
 <?php
 elseif ($apiDoc->type === 'define'):
     // apiDefine
